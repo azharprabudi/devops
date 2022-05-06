@@ -29,5 +29,8 @@
 - include_tasks: kubeadm.yaml
 
 - tags: notest
+  include_tasks: swap.yaml
+
+- tags: notest
   include_tasks: init-control-plane.yaml
   when: kubeadm_action == "init_control_plane"
