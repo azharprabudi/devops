@@ -1,0 +1,34 @@
+---
+- name: Create containerd.conf
+  shell:
+    cat <<EOF | sudo tee /etc/modules-load.d/containerd.conf
+    overlay
+    br_netfilter
+    EOF
+  become: yes
+
+- name: Download containerd
+  get_url:
+    url: https://github.com/containerd/containerd/releases/download/v{{ containerd_version }}/containerd-{{ containerd_version }}-linux-{{ arch }}.tar.gz
+    dest: /tmp/containerd.tar.gz
+
+- name: Extract containerd
+  unarchive:
+    src: /tmp/containerd.tar.gz
+    dest: /usr/local
+    remote_src: yes
+  become: yes
+
+- name: Download containerd.service
+  get_url:
+    url: https://raw.githubusercontent.com/containerd/containerd/main/containerd.service
+    dest: /etc/systemd/system/containerd.service
+  become: yes
+
+- name: Reload systemd & enable containerd service
+  systemd:
+    state: started
+    name: containerd
+    enabled: yes
+    daemon_reload: yes
+  become: yes

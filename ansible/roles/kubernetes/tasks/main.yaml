@@ -1,0 +1,32 @@
+---
+- name: Install required dependencies
+  apt:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - net-tools
+    - socat
+    - conntrack
+  become: yes
+
+- name: Hold required dependencies version
+  dpkg_selections:
+    name: "{{ item }}"
+    selection: hold
+  with_items:
+    - socat
+    - conntrack
+  become: yes
+
+- include_tasks: kubelet.yaml
+- include_tasks: kubectl.yaml
+- include_tasks: kubeadm.yaml
+
+- include_tasks: init-control-plane.yaml
+  when: action == "init_control_plane"
+
+- include_tasks: join-control-plane.yaml
+  when: action == "join_control_plane"
+
+- include_tasks: join-worker-node.yaml
+  when: action == "join_worker_node"

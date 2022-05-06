@@ -1,0 +1,6 @@
+---
+arch: amd64
+kubelet_version: v1.23.6
+kubectl_version: v1.23.6
+kubeadm_version: v1.23.6
+pods_cidr: 192.168.0.0/16

@@ -1,0 +1,36 @@
+---
+- name: Download kubelet
+  get_url: 
+    url: https://storage.googleapis.com/kubernetes-release/release/{{ kubelet_version }}/bin/linux/{{ arch }}/kubelet
+    dest: /usr/local/bin
+    mode: +x
+  become: yes
+
+- name: Copy kubelet systemd
+  synchronize:
+    src: ../files/kubelet.service
+    dest: /etc/systemd/system/kubelet.service
+  become: yes
+
+- name: Create folder kubelet config
+  file:
+    path: /etc/systemd/system/kubelet.service.d
+    state: directory
+    recurse: true
+  become: yes
+
+- name: Copy kubelet config
+  synchronize:
+    src: ../files/10-kubeadm.conf
+    dest: /etc/systemd/system/kubelet.service.d/10-kubeadm.conf
+  become: yes
+
+- name: Enable kubelet systemd
+  systemd:
+    state: started
+    name: kubelet
+    enabled: yes
+    daemon_reload: yes
+  become: yes
+
+

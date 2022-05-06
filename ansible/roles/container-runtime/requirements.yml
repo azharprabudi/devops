@@ -1,0 +1,7 @@
+---
+roles:
+  - name: robertdebock.bootstrap
+  - name: robertdebock.modprobe
+collections:
+  - name: community.general
+  - name: community.docker

@@ -1,0 +1,21 @@
+---
+- name: Create cni-plugins directory 
+  file:
+    path: /opt/cni/bin
+    recurse: yes
+    state: directory
+  become: true
+
+- name: Download cni-plugins
+  get_url:
+    url: https://github.com/containernetworking/plugins/releases/download/v{{ cni_plugins_version }}/cni-plugins-linux-{{ arch }}-v{{ cni_plugins_version }}.tgz
+    dest: /tmp/cni-plugins.tgz
+
+- name: Extract cni-plugins
+  unarchive:
+    src: /tmp/cni-plugins.tgz
+    dest: /opt/cni/bin
+    remote_src: yes
+  become: true
+
+

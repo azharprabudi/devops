@@ -1,0 +1,20 @@
+VAGRANTFILE_API_VERSION = "2"
+
+Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
+  config.vm.box = "ubuntu/xenial64"
+  config.vm.box_version = "20211001.0.0"
+
+  config.vm.define "kubernetes-control-plane-0" do |machine|
+    machine.vm.hostname = "kubernetes-control-plane-0"
+    machine.vm.network "private_network", ip: "172.17.177.11"
+    machine.vm.network :forwarded_port, guest: 6443, host: 6443, protocol: "tcp"
+
+    machine.vm.provision "ansible_local" do |ansible|
+      ansible.become = true
+      ansible.verbose = true
+      ansible.install = true
+      ansible.playbook = "../../ansible/playbook/control-plane-node-0.yaml"
+      ansible.inventory_path = "../../ansible/hosts"
+    end
+  end
+end

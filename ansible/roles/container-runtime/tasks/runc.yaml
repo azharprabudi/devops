@@ -1,0 +1,11 @@
+---
+- name: Download runc
+  get_url:
+    url: https://github.com/opencontainers/runc/releases/download/v{{ runc_version }}/runc.{{ arch }}
+    dest: /tmp/runc.{{ arch }}
+
+- name: Install runc
+  shell: |
+    install -m 755 /tmp/runc.{{ arch }} /usr/local/sbin/runc
+  become: yes
+

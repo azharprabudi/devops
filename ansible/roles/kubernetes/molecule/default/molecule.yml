@@ -1,0 +1,26 @@
+---
+dependency:
+  name: galaxy
+driver:
+  name: docker
+#lint: |
+# set -e
+# yamllint .
+# ansible-lint .
+platforms:
+  - name: instance
+    image: robertdebock/ubuntu:xenial
+    command: /sbin/init
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+      - /lib/modules:/lib/modules:ro
+    privileged: yes
+    pre_build_image: yes
+provisioner:
+  name: ansible
+  env:
+    ANSIBLE_ROLES_PATH: ../../../:~/.ansible/roles:/usr/share/ansible/roles:/etc/ansible/roles
+  playbooks:
+    converge: ${MOLECULE_PLAYBOOK:-converge.yml}
+verifier:
+  name: ansible
