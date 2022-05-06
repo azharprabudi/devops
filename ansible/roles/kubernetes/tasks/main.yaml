@@ -18,15 +18,16 @@
     - conntrack
   become: yes
 
+- name: Create kubernetes folder
+  file:
+    path: /opt/kubernetes
+    state: directory
+  become: yes
+
 - include_tasks: kubelet.yaml
 - include_tasks: kubectl.yaml
 - include_tasks: kubeadm.yaml
 
-- include_tasks: init-control-plane.yaml
-  when: action == "init_control_plane"
-
-- include_tasks: join-control-plane.yaml
-  when: action == "join_control_plane"
-
-- include_tasks: join-worker-node.yaml
-  when: action == "join_worker_node"
+- tags: notest
+  include_tasks: init-control-plane.yaml
+  when: kubeadm_action == "init_control_plane"

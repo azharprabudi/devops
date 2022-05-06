@@ -1,1 +1,7 @@
 ---
+- name: Download kubectl
+  get_url: 
+    url: https://storage.googleapis.com/kubernetes-release/release/{{ kubectl_version }}/bin/linux/{{ arch }}/kubectl
+    dest: /usr/local/bin
+    mode: +x
+  become: yes

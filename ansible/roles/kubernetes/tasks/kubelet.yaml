@@ -6,23 +6,37 @@
     mode: +x
   become: yes
 
-- name: Copy kubelet systemd
-  synchronize:
-    src: ../files/kubelet.service
+- name: Download kubelet systemd
+  get_url:
+    url: https://raw.githubusercontent.com/kubernetes/release/v0.4.0/cmd/kubepkg/templates/latest/deb/kubelet/lib/systemd/system/kubelet.service
     dest: /etc/systemd/system/kubelet.service
   become: yes
 
-- name: Create folder kubelet config
+- name: Replace kubelet binary path on kubelet.service
+  replace:
+    path: /etc/systemd/system/kubelet.service
+    regexp: "\/usr\/bin"
+    replace: "/usr/local/bin"
+  become: yes
+
+- name: Create kubelet.service.d directory
   file:
     path: /etc/systemd/system/kubelet.service.d
     state: directory
-    recurse: true
+    recurse: yes
   become: yes
 
-- name: Copy kubelet config
-  synchronize:
-    src: ../files/10-kubeadm.conf
+- name: Download kubelet kubeadm config
+  get_url:
+    url: https://raw.githubusercontent.com/kubernetes/release/v0.4.0/cmd/kubepkg/templates/latest/deb/kubeadm/10-kubeadm.conf
     dest: /etc/systemd/system/kubelet.service.d/10-kubeadm.conf
+  become: yes
+
+- name: Replace kubelet binary path on kubelet.service
+  replace:
+    path: /etc/systemd/system/kubelet.service.d/10-kubeadm.conf
+    regexp: "\/usr\/bin"
+    replace: "/usr/local/bin"
   become: yes
 
 - name: Enable kubelet systemd
@@ -32,5 +46,3 @@
     enabled: yes
     daemon_reload: yes
   become: yes
-
-

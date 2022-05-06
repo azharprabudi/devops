@@ -1,1 +1,7 @@
 ---
+- name: Download kubeadm
+  get_url: 
+    url: https://storage.googleapis.com/kubernetes-release/release/{{ kubeadm_version }}/bin/linux/{{ arch }}/kubeadm
+    dest: /usr/local/bin
+    mode: +x
+  become: yes

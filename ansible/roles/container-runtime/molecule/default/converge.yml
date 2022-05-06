@@ -10,10 +10,6 @@
       with_items:
         - ca-certificates
   roles:
-    - role: robertdebock.modprobe
-      modprobe_modules:
-        - overlay
-        - br_netfilter
     - role: container-runtime
   vars:
     vendor: containerd

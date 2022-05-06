@@ -1,42 +1,30 @@
 ---
-- name: Verify containerd
+- name: Verify kubernetes
   hosts: all
   tasks: 
-    - name: Get containerd binary path
-      shell: which containerd
-      register: containerd_bin_path
+    - name: Get kubelet binary path
+      shell: which kubelet
+      register: kubelet_bin_path
 
-    - name: Ensure the containerd binary path installed
+    - name: Ensure the kubelet binary path installed
       assert:
         that:
-          - "containerd_bin_path.stdout != ''"
+          - "kubelet_bin_path.stdout != ''"
 
-    - name: Get runc binary path
-      shell: which runc
-      register: runc_bin_path
+    - name: Get kubeadm binary path
+      shell: which kubeadm
+      register: kubeadm_bin_path
 
-    - name: Ensure the runc binary path installed
+    - name: Ensure the kubeadm binary path installed
       assert:
         that:
-          - "runc_bin_path.stdout != ''"
+          - "kubeadm_bin_path.stdout != ''"
 
-    - name: Get crictl binary path
-      shell: which crictl
-      register: crictl_bin_path
+    - name: Get kubectl binary path
+      shell: which kubectl
+      register: kubectl_bin_path
 
-    - name: Ensure the crictl binary path installed
+    - name: Ensure the kubectl binary path installed
       assert:
         that:
-          - "crictl_bin_path.stdout != ''"
-
-    - name: Get containerd systemd status
-      systemd:
-        name: containerd
-      register: containerd_systemd
-
-    - name: Ensure the containerd systemd is running
-      assert:
-        that:
-          - "containerd_systemd.status.ActiveState == 'active'"
-
-
+          - "kubectl_bin_path.stdout != ''"

@@ -1,5 +1,5 @@
 ---
-- name: Converge containerd
+- name: Converge kubernetes control plane
   hosts: all
   become: true
   pre_tasks:
@@ -10,11 +10,7 @@
       with_items:
         - ca-certificates
   roles:
-    - role: robertdebock.modprobe
-      modprobe_modules:
-        - overlay
-        - br_netfilter
-    - role: container-runtime
+    - role: kubernetes
   vars:
     vendor: containerd
 

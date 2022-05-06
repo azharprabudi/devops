@@ -1,0 +1,15 @@
+---
+- name: Check the cluster already initialized
+  stat:
+    path: /opt/kubernetes/init_control_plane.out
+  register: init_control_plane
+  become: yes
+
+- name: Initialize control plane
+  shell: |
+    kubeadm init --upload-certs | tee /opt/kubeadm/init.out
+  become: yes
+  when: not init_control_plane.stat.exists
+
+
+
