@@ -6,7 +6,7 @@
     state: present
   with_items:
     - overlay
-    - bf_netfilter
+    - br_netfilter
 
 - name: Create containerd.conf
   shell:

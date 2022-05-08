@@ -1,0 +1,5 @@
+---
+- hosts: k8s-worker-node-0
+  roles:
+    - ../roles/container-runtime
+    - ../roles/kubernetes

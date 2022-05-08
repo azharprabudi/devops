@@ -2,6 +2,6 @@
 arch: amd64
 vendor: containerd
 runc_version: 1.1.1
-crictl_version: 1.23.0
+crictl_version: v1.23.0
 containerd_version: 1.6.4
 cni_plugins_version: 1.1.1

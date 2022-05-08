@@ -7,9 +7,6 @@
 
 - name: Initialize control plane
   shell: |
-    kubeadm init --upload-certs | tee /opt/kubeadm/init.out
-  become: yes
+    kubeadm init --upload-certs | tee /opt/kubernetes/init_control_plane.out
   when: not init_control_plane.stat.exists
-
-
-
+  become: yes

@@ -1,0 +1,86 @@
+Vagrant.require_version ">= 2.0.0"
+
+# Networking variables
+net_subnet = "192.168.56"
+
+# Virtual machine variables
+vm_cpus = 2
+vm_memory = 2048
+vm_os = "generic/ubuntu2004"
+vm_user = "vagrant"
+vm_replicas = 1
+
+# initialize script to resolve access to the internet
+$script = <<-SCRIPT
+echo "Initialize provisioning"
+sudo apt-get update
+
+echo "Set temporary dns resolver"
+sudo cp /etc/resolv.conf /etc/resolv.conf.bak
+sudo echo "nameserver 8.8.8.8" > /etc/resolv.conf
+sudo echo "nameserver 8.8.4.4" >> /etc/resolv.conf
+sudo cat /etc/resolv.conf.bak >> /etc/resolv.conf
+
+echo "Installing resolvconf for permanent dns resolver"
+sudo apt-get install -y resolvconf
+sudo systemctl enable resolvconf
+sudo systemctl start resolvconf
+sudo systemctl status resolvconf
+sudo cp /etc/resolvconf/resolv.conf.d/head /etc/resolvconf/resolv.conf.d/head.bak
+if grep -q "8.8.8.8" "/etc/resolvconf/resolv.conf.d/head"; then
+  sudo echo "nameserver 8.8.8.8" > /etc/resolvconf/resolv.conf.d/head
+  sudo echo "nameserver 8.8.4.4" >> /etc/resolvconf/resolv.conf.d/head
+  sudo cat /etc/resolvconf/resolv.conf.d/head.bak >> /etc/resolvconf/resolv.conf.d/head
+fi
+sudo resolvconf -u
+
+echo "Install python3 for running ansible"
+sudo apt-get install -y python3 python3-pip
+sudo python3 -m pip install ansible
+SCRIPT
+
+Vagrant.configure("2") do |config|
+  (1..vm_replicas).each do |i|
+    if i == 1
+      vm_name = "k8s-master"
+    else
+      vm_name = "k8s-worker-node-#{i-2}"
+    end
+
+    config.vm.define vm_name do |host|
+      ip = "#{net_subnet}.#{i+100}"
+
+      host.vm.box = vm_os
+      host.vm.hostname = vm_name
+      host.vm.network :private_network, ip: ip
+      host.vm.synced_folder "../../ansible", "/vagrant/ansible"
+
+      host.ssh.username = vm_user
+      host.ssh.insert_key = false
+
+      host.vm.provision "shell", inline: $script
+
+      if i == 1
+        host.vm.provision "ansible_local" do |ansible|
+          ansible.become = true
+          ansible.verbose = true
+          ansible.playbook = "ansible/playbook/k8s-master.yaml"
+          ansible.inventory_path = "ansible/hosts"
+        end
+      else
+        host.vm.provision "ansible_local" do |ansible|
+          ansible.become = true
+          ansible.verbose = true
+          ansible.playbook = "ansible/playbook/k8s-worker-node-#{i-2}.yaml"
+          ansible.inventory_path = "ansible/hosts"
+        end
+      end
+
+      host.vm.provider :virtualbox do |vb|
+        vb.cpus = vm_cpus
+        vb.memory = vm_memory
+        vb.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
+      end
+    end
+  end
+end
