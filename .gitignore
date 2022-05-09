@@ -2,3 +2,7 @@
 
 *.log
 .vagrant
+
+# NodeJS
+
+node_modules/
