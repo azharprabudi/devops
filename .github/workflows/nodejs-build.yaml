@@ -1,1 +1,16 @@
 ---
+name: Example
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  example:
+    name: Example
+    runs-on: ubuntu-latest
+    steps:
+      - name: Probot Example
+        # You may pin to the exact commit or the version.
+        # uses: probot/example-github-action@ed4fcf8e558e13f7dcb2afb82f89d713ac8d7048
+        uses: probot/example-github-action@v1.0.0
